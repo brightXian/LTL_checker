@@ -1,0 +1,21 @@
+# .pre-commit-config.yaml
+
+repos:
+  # ruff: lint + format
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+        args: [--fix]       # auto-fix fixable issues
+      - id: ruff-format     # format (like black)
+
+  # standard file hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace   # remove trailing spaces
+      - id: end-of-file-fixer     # ensure files end with a newline
+      - id: check-yaml            # validate yaml syntax
+      - id: check-toml            # validate toml syntax
+      - id: check-merge-conflict  # catch unresolved merge conflicts
+      - id: debug-statements      # catch forgotten debugger calls
