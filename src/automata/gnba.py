@@ -293,10 +293,10 @@ def _build_transitions(
             if valid:
                 successors.append(j)
 
-        transitions[i] = {b_ap: successors}
         # Only the matching AP set is stored. Callers must use
         # transitions[i].get(A, []) for other AP subsets,
         # which implicitly have no successors.
+        transitions[i] = {b_ap: successors}
 
     return transitions
 

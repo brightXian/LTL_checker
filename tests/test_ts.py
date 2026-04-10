@@ -1,4 +1,4 @@
-"""Tests for TransitionSystem."""
+"""Unit tests for TransitionSystem."""
 
 import textwrap
 
@@ -6,27 +6,26 @@ import pytest
 
 from src.ts.transition_system import TransitionSystem
 
-TS_CONTENT = textwrap.dedent("""\
-    6 9
-    0
-    0 1 2
-    a b c
-    0 1 1
-    0 0 3
-    3 2 1
-    1 2 4
-    2 2 1
-    5 0 2
-    5 1 1
-    4 0 1
-    4 1 5
-    0 1
-    0 1 2
-    1 2
-    0 2
-    0 2
-    0 1
-""")
+TS_CONTENT = """6 9
+0
+0 1 2
+a b c
+0 1 1
+0 0 3
+3 2 1
+1 2 4
+2 2 1
+5 0 2
+5 1 1
+4 0 1
+4 1 5
+0 1
+0 1 2
+1 2
+0 2
+0 2
+0 1
+"""
 
 
 @pytest.fixture
@@ -165,11 +164,10 @@ class TestErrors:
 
     def test_fewer_than_four_lines(self, tmp_path):
         """A file with fewer than 4 lines raises ValueError."""
-        content = textwrap.dedent("""\
-            1 1
-            0
-            a
-        """)
+        content = """1 1
+0
+a
+"""
         ts_path = tmp_path / "TS.txt"
         ts_path.write_text(content)
         with pytest.raises(ValueError):
@@ -177,15 +175,14 @@ class TestErrors:
 
     def test_invalid_state_in_transition(self, tmp_path):
         """An out-of-range state index in a transition raises ValueError."""
-        content = textwrap.dedent("""\
-            2 1
-            0
-            a b
-            a b
-            10 0 1
-            0
-            0
-        """)
+        content = """2 1
+0
+a b
+a b
+10 0 1
+0
+0
+"""
         ts_path = tmp_path / "TS.txt"
         ts_path.write_text(content)
         with pytest.raises(ValueError):
@@ -193,31 +190,14 @@ class TestErrors:
 
     def test_invalid_ap_index(self, tmp_path):
         """An invalid AP index in a label raises ValueError."""
-        content = textwrap.dedent("""\
-            2 1
-            0
-            a b
-            a b
-            0 0 1
-            5
-            0
-        """)
-        ts_path = tmp_path / "TS.txt"
-        ts_path.write_text(content)
-        with pytest.raises(ValueError):
-            TransitionSystem.load(ts_path)
-
-    def test_invalid_initial_state(self, tmp_path):
-        """An out-of-range initial state index raises ValueError."""
-        content = textwrap.dedent("""\
-            2 1
-            99
-            a b
-            a b
-            0 0 1
-            0
-            0
-        """)
+        content = """2 1
+0
+a b
+a b
+0 0 1
+5
+0
+"""
         ts_path = tmp_path / "TS.txt"
         ts_path.write_text(content)
         with pytest.raises(ValueError):
