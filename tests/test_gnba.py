@@ -1,11 +1,11 @@
 """Unit tests for GNBA construction."""
 
-from src.automata.gnba import (
+from src.automata.closure import (
     TRUE_ATOM,
     _compute_closure,
     _rewrite,
-    ltl_to_gnba,
 )
+from src.automata.gnba import ltl_to_gnba
 from src.parser.ast_nodes import And, Atom, Next, Not, Until
 from src.parser.parser import parse
 
