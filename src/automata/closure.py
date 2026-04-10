@@ -28,7 +28,7 @@ def _negate(node: ASTNode) -> ASTNode:
     return Not(child=node)
 
 
-def _rewrite(formula: ASTNode) -> ASTNode:
+def rewrite(formula: ASTNode) -> ASTNode:
     """Rewrite formula to basic operators (Atom, Not, And, Next,Until only).
 
     Rules:
@@ -48,39 +48,39 @@ def _rewrite(formula: ASTNode) -> ASTNode:
         return formula
 
     if isinstance(formula, Not):
-        return _negate(_rewrite(formula.child))
+        return _negate(rewrite(formula.child))
 
     if isinstance(formula, And):
-        return And(left=_rewrite(formula.left), right=_rewrite(formula.right))
+        return And(left=rewrite(formula.left), right=rewrite(formula.right))
 
     if isinstance(formula, Or):
         # Or(a, b) -> Not(And(Not(a), Not(b)))
-        not_a = _negate(_rewrite(formula.left))
-        not_b = _negate(_rewrite(formula.right))
+        not_a = _negate(rewrite(formula.left))
+        not_b = _negate(rewrite(formula.right))
         and_node = And(left=not_a, right=not_b)
         return Not(child=and_node)
 
     if isinstance(formula, Imply):
         # Imply(a, b) -> Not(And(a, Not(b)))
-        a = _rewrite(formula.left)
-        b = _negate(_rewrite(formula.right))
+        a = rewrite(formula.left)
+        b = _negate(rewrite(formula.right))
         and_node = And(left=a, right=b)
         return Not(child=and_node)
 
     if isinstance(formula, Next):
-        return Next(child=_rewrite(formula.child))
+        return Next(child=rewrite(formula.child))
 
     if isinstance(formula, Finally):
         # Finally(a) -> Until(TRUE_ATOM, a)
-        return Until(left=TRUE_ATOM, right=_rewrite(formula.child))
+        return Until(left=TRUE_ATOM, right=rewrite(formula.child))
 
     if isinstance(formula, Globally):
         # Globally(a) -> Not(Until(TRUE_ATOM, Not(a)))
-        a = _rewrite(formula.child)
+        a = rewrite(formula.child)
         return _negate(Until(left=TRUE_ATOM, right=_negate(a)))
 
     if isinstance(formula, Until):
-        return Until(left=_rewrite(formula.left), right=_rewrite(formula.right))
+        return Until(left=rewrite(formula.left), right=rewrite(formula.right))
 
     # Reject unknown node types
     raise TypeError(f"Unexpected AST node type: {type(formula)}")
@@ -97,7 +97,7 @@ def _collect_subformulas(node: ASTNode) -> list[ASTNode]:
     return result
 
 
-def _compute_closure(formula: ASTNode) -> list[ASTNode]:
+def compute_closure(formula: ASTNode) -> list[ASTNode]:
     """Compute closure of formula.
 
     Closure(phi) = all subformulas psi of phi plus their negations Not(psi).
@@ -184,7 +184,7 @@ def _is_elementary(b: frozenset[str], closure: list[ASTNode]) -> bool:
     return True
 
 
-def _compute_elementary_sets(closure: list[ASTNode]) -> list[frozenset[str]]:
+def compute_elementary_sets(closure: list[ASTNode]) -> list[frozenset[str]]:
     """Compute all elementary sets using powerset enumeration.
 
     Args:

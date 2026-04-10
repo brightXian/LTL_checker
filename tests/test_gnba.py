@@ -2,8 +2,8 @@
 
 from src.automata.closure import (
     TRUE_ATOM,
-    _compute_closure,
-    _rewrite,
+    compute_closure,
+    rewrite,
 )
 from src.automata.gnba import ltl_to_gnba
 from src.parser.ast_nodes import And, Atom, Next, Not, Until
@@ -11,56 +11,56 @@ from src.parser.parser import parse
 
 
 class TestRewrite:
-    """Test _rewrite produces only Atom, Not, And, Next, Until nodes."""
+    """Test rewrite produces only Atom, Not, And, Next, Until nodes."""
 
     def test_atom_unchanged(self):
         """parse("a") -> Atom("a") (unchanged)."""
-        result = _rewrite(parse("a"))
+        result = rewrite(parse("a"))
         assert isinstance(result, Atom)
         assert result.name == "a"
 
     def test_not_unchanged(self):
         """parse("!a") -> Not(Atom("a")) (unchanged)."""
-        result = _rewrite(parse("!a"))
+        result = rewrite(parse("!a"))
         assert isinstance(result, Not)
 
     def test_and_unchanged(self):
         """parse("(a /\\ b)") -> And(Atom("a"), Atom("b")) (unchanged)."""
-        result = _rewrite(parse("(a /\\ b)"))
+        result = rewrite(parse("(a /\\ b)"))
         assert isinstance(result, And)
 
     def test_until_unchanged(self):
         """parse("a U b") -> Until(Atom("a"), Atom("b")) (unchanged)."""
-        result = _rewrite(parse("a U b"))
+        result = rewrite(parse("a U b"))
         assert isinstance(result, Until)
 
     def test_next_unchanged(self):
         """parse("X(a)") -> Next(Atom("a")) (unchanged)."""
-        result = _rewrite(parse("X(a)"))
+        result = rewrite(parse("X(a)"))
         assert isinstance(result, Next)
 
     def test_or_produces_not_and(self):
         """parse("(a \\/ b)") -> produces Not(And(Not(a), Not(b)))."""
-        result = _rewrite(parse("(a \\/ b)"))
+        result = rewrite(parse("(a \\/ b)"))
         assert isinstance(result, Not)
         assert isinstance(result.child, And)
 
     def test_imply_produces_not_and(self):
         """parse("(a -> b)") -> produces Not(And(a, Not(b)))."""
-        result = _rewrite(parse("(a -> b)"))
+        result = rewrite(parse("(a -> b)"))
         assert isinstance(result, Not)
         assert isinstance(result.child, And)
 
     def test_finally_becomes_until(self):
         """parse("F(a)") -> Until(TRUE_ATOM, Atom("a"))."""
-        result = _rewrite(parse("F(a)"))
+        result = rewrite(parse("F(a)"))
         assert isinstance(result, Until)
         assert result.left == TRUE_ATOM
         assert isinstance(result.right, Atom)
 
     def test_globally_becomes_not_until(self):
         """parse("G(a)") -> Not(Until(TRUE_ATOM, Not(Atom("a"))))."""
-        result = _rewrite(parse("G(a)"))
+        result = rewrite(parse("G(a)"))
         assert isinstance(result, Not)
         assert isinstance(result.child, Until)
         # No double negation: right child of Until is Not(Atom("a"))
@@ -72,12 +72,12 @@ class TestRewrite:
 
 
 class TestComputeClosure:
-    """Test _compute_closure returns correct size and contents."""
+    """Test compute_closure returns correct size and contents."""
 
     def test_until_closure_size(self):
         """Closure of Until(a, b) has 6 elements."""
         phi = Until(Atom("a"), Atom("b"))
-        closure = _compute_closure(phi)
+        closure = compute_closure(phi)
         assert len(closure) == 6
         expected = {"(a U b)", "!((a U b))", "a", "!(a)", "b", "!(b)"}
         assert expected == {str(p) for p in closure}
@@ -85,7 +85,7 @@ class TestComputeClosure:
     def test_next_closure_size(self):
         """Closure of Next(a) has 4 elements."""
         phi = Next(Atom("a"))
-        closure = _compute_closure(phi)
+        closure = compute_closure(phi)
         assert len(closure) == 4
         expected = {"X(a)", "!(X(a))", "a", "!(a)"}
         assert expected == {str(p) for p in closure}

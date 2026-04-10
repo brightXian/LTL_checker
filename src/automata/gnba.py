@@ -4,9 +4,9 @@ from dataclasses import dataclass
 
 from src.automata.closure import (
     TRUE_ATOM,
-    _compute_closure,
-    _compute_elementary_sets,
-    _rewrite,
+    compute_closure,
+    compute_elementary_sets,
+    rewrite,
 )
 from src.parser.ast_nodes import (
     ASTNode,
@@ -118,13 +118,13 @@ def ltl_to_gnba(formula: ASTNode) -> GNBA:
         GNBA representing the formula.
     """
     # Rewrite to basic operators (And, Not, Next, Until)
-    phi = _rewrite(formula)
+    phi = rewrite(formula)
 
     # Compute closure (subformulas + their negations)
-    closure = _compute_closure(phi)
+    closure = compute_closure(phi)
 
     # Compute maximally consistent subsets
-    states = _compute_elementary_sets(closure)
+    states = compute_elementary_sets(closure)
 
     # Initial states: {b in states | phi in b}
     initial_states = [b for b in states if str(phi) in b]
