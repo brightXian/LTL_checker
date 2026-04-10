@@ -100,12 +100,10 @@ class Parser:
         """
         token = self.current()
 
-        # Atom: ATOM token
         if token.type == TokenType.ATOM:
             self.advance()
             return Atom(name=token.value)
 
-        # Unary operator: ! | X | G | F
         if token.type in (
             TokenType.NOT,
             TokenType.NEXT,
@@ -120,12 +118,11 @@ class Parser:
                 return Next(child=child)
             elif op.type == TokenType.GLOBALLY:
                 return Globally(child=child)
-            else:
+            elif op.type == TokenType.FINALLY:
                 return Finally(child=child)
 
-        # Parenthesized subformula
         if token.type == TokenType.LPAREN:
-            self.advance()  # consume '('
+            self.advance()
             result = self.parse_formula()
             self.expect(TokenType.RPAREN)
             return result
@@ -142,10 +139,8 @@ class Parser:
         Returns:
             AST node.
         """
-        # Parse left operand using primary (handles atoms, unary ops, parenthesized)
         left = self.parse_primary()
 
-        # Check for binary operator following the left operand
         if self.pos < len(self.tokens):
             op_token = self.current()
             if op_token.type in (
@@ -154,7 +149,7 @@ class Parser:
                 TokenType.OR,
                 TokenType.IMPLY,
             ):
-                self.advance()  # consume binary operator
+                self.advance()
                 right = self.parse_formula()
 
                 if op_token.type == TokenType.UNTIL:
@@ -166,7 +161,6 @@ class Parser:
                 else:
                     return Imply(left=left, right=right)
 
-        # No binary operator - return single operand
         return left
 
 
