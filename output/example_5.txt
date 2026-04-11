@@ -1,0 +1,47 @@
+[Transition System]
+  AP: {a, b}
+  States:
+    * L(s0) = {a}
+      L(s1) = {a}
+  Actions: {0, 1}
+  Transitions:
+      s0 -> s1  [0]
+      s1 -> s0  [0]
+[LTL Benchmark]
+  Global formulas:
+      F b
+  Local formulas:
+[GNBA]
+  AP: {b}
+  States:
+    * q0: {!((true U b)), !(b), true}
+      q1: {(true U b), true, b}
+      q2: {!(b), (true U b), true}
+  Acceptance sets:
+      F0 = {q0, q1}
+  Transitions:
+      q0 -> {q0}  [∅]
+      q1 -> {q0, q1, q2}  [b]
+      q2 -> {q1, q2}  [∅]
+[NBA]
+  AP: {b}
+  States:
+    * q0_1
+      q1_1
+      q2_1
+  Acceptance set:
+      F = {q0_1, q1_1}
+  Transitions:
+      q0_1 -> {q0_1}  [∅]
+      q1_1 -> {q0_1, q1_1, q2_1}  [b]
+      q2_1 -> {q1_1, q2_1}  [∅]
+[Product TS x NBA]
+  States:
+    * (s0, q0_1)
+      (s1, q0_1)
+  Acceptance set:
+      F = {(s0, q0_1), (s1, q0_1)}
+  Transitions:
+      (s0, q0_1) -> {(s1, q0_1)}
+      (s1, q0_1) -> {(s0, q0_1)}
+0
