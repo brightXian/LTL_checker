@@ -18,7 +18,7 @@ class TransitionSystem:
     labels: list[frozenset[str]]
 
     @classmethod
-    def load(cls, filepath: str | Path) -> "TransitionSystem":
+    def load(cls, filepath: str | Path, verbose: bool = False) -> "TransitionSystem":
         """Load a transition system from a TS.txt file.
 
         Args:
@@ -127,7 +127,7 @@ class TransitionSystem:
                 except ValueError as e:
                     raise ValueError(f"Error parsing label for state {i}: {e}") from e
 
-        return cls(
+        instance = cls(
             num_states=num_states,
             initial_states=initial_states,
             actions=actions,
@@ -135,6 +135,9 @@ class TransitionSystem:
             transitions=transitions,
             labels=labels,
         )
+        if verbose:
+            print(instance)
+        return instance
 
     def post(self, state: int) -> frozenset[int]:
         """Get all successor states reachable from the given state.
@@ -165,3 +168,17 @@ class TransitionSystem:
     def label(self, state: int) -> frozenset[str]:
         """Return atomic propositions true at state (adapter for product construction)."""
         return self.labels[state]
+
+    def __str__(self) -> str:
+        lines = ["[Transition System]"]
+        lines.append(f"  AP: {{{', '.join(self.atomic_props)}}}")
+        lines.append("  States:")
+        for i in range(self.num_states):
+            marker = "*" if i in self.initial_states else " "
+            label_str = "{" + ", ".join(sorted(self.labels[i])) + "}"
+            lines.append(f"    {marker} L(s{i}) = {label_str}")
+        lines.append(f"  Actions: {{{', '.join(self.actions)}}}")
+        lines.append("  Transitions:")
+        for src, act, dst in self.transitions:
+            lines.append(f"      s{src} -> s{dst}  [{self.actions[act]}]")
+        return "\n".join(lines)

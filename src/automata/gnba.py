@@ -27,6 +27,29 @@ class GNBA:
     transitions: dict[int, dict[frozenset[str], list[int]]]
     atomic_props: frozenset[str]
 
+    def __str__(self) -> str:
+        lines = ["[GNBA]"]
+        lines.append(f"  AP: {{{', '.join(sorted(self.atomic_props))}}}")
+        lines.append("  States:")
+        for i, s in enumerate(self.states):
+            marker = "*" if s in self.initial_states else " "
+            formulas = ", ".join(f.replace("__true__", "true") for f in sorted(s))
+            lines.append(f"    {marker} q{i}: {{{formulas}}}")
+        lines.append("  Acceptance sets:")
+        for j, acc in enumerate(self.acceptance_sets):
+            indices = [self.states.index(s) for s in acc]
+            lines.append(
+                f"      F{j} = {{q{', q'.join(str(i) for i in sorted(indices))}}}"
+            )
+        lines.append("  Transitions:")
+        for i, trans in self.transitions.items():
+            for ap_set, succs in trans.items():
+                if succs:
+                    ap_str = ", ".join(sorted(ap_set)) if ap_set else "∅"
+                    succ_str = "q" + ", q".join(str(j) for j in succs)
+                    lines.append(f"      q{i} -> {{{succ_str}}}  [{ap_str}]")
+        return "\n".join(lines)
+
 
 def _build_transitions(
     states: list[frozenset[str]],
@@ -108,7 +131,7 @@ def _build_transitions(
     return transitions
 
 
-def ltl_to_gnba(formula: ASTNode) -> GNBA:
+def ltl_to_gnba(formula: ASTNode, verbose: bool = False) -> GNBA:
     """Convert an LTL formula to a GNBA.
 
     Args:
@@ -148,10 +171,14 @@ def ltl_to_gnba(formula: ASTNode) -> GNBA:
     # Transitions
     transitions = _build_transitions(states, closure, ap_names)
 
-    return GNBA(
+    gnba = GNBA(
         states=states,
         initial_states=initial_states,
         acceptance_sets=acceptance_sets,
         transitions=transitions,
         atomic_props=ap_names,
     )
+
+    if verbose:
+        print(gnba)
+    return gnba

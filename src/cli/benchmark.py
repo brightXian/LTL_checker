@@ -1,7 +1,9 @@
 from pathlib import Path
 
 
-def parse_benchmark(filepath: str | Path) -> tuple[list[str], list[tuple[int, str]]]:
+def parse_benchmark(
+    filepath: str | Path, verbose: bool = False
+) -> tuple[list[str], list[tuple[int, str]]]:
     """Parse benchmark.txt into global and local LTL formulas."""
     with open(filepath) as f:
         lines = [line.strip() for line in f if line.strip()]
@@ -26,5 +28,14 @@ def parse_benchmark(filepath: str | Path) -> tuple[list[str], list[tuple[int, st
                 f"Local formula line must have 2 values, found {len(parts)}"
             )
         local_formulas.append((int(parts[0]), parts[1]))
+
+    if verbose:
+        print("[LTL Benchmark]")
+        print("  Global formulas:")
+        for _, f in enumerate(global_formulas):
+            print(f"      {f}")
+        print("  Local formulas:")
+        for state_idx, f in local_formulas:
+            print(f"      s{state_idx}: {f}")
 
     return global_formulas, local_formulas
