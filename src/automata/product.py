@@ -15,8 +15,31 @@ class ProductTS:
     transitions: dict[tuple, list[tuple]]
     accepting_states: frozenset[tuple]
 
+    def __str__(self) -> str:
+        lines = ["[Product TS x NBA]"]
+        lines.append("  States:")
+        for s, q in self.states:
+            q_idx, layer = q
+            marker = "*" if (s, q) in self.initial_states else " "
+            lines.append(f"    {marker} (s{s}, q{q_idx}_{layer})")
+        lines.append("  Acceptance set:")
+        acc_str = ", ".join(
+            f"(s{s}, q{q_idx}_{layer})"
+            for s, (q_idx, layer) in sorted(self.accepting_states)
+        )
+        lines.append(f"      F = {{{acc_str}}}")
+        lines.append("  Transitions:")
+        for (s, q), succs in self.transitions.items():
+            if succs:
+                q_idx, layer = q
+                succ_str = ", ".join(
+                    f"(s{t}, q{p_idx}_{p_layer})" for t, (p_idx, p_layer) in succs
+                )
+                lines.append(f"      (s{s}, q{q_idx}_{layer}) -> {{{succ_str}}}")
+        return "\n".join(lines)
 
-def product_ts_nba(ts, nba: NBA) -> ProductTS:
+
+def product_ts_nba(ts, nba: NBA, verbose: bool = False) -> ProductTS:
     """Build product of Transition System and NBA.
 
     Args:
@@ -86,9 +109,13 @@ def product_ts_nba(ts, nba: NBA) -> ProductTS:
         (s, q) for (s, q) in reachable if q in nba.acceptance_set
     )
 
-    return ProductTS(
+    product = ProductTS(
         states=states,
         initial_states=initial_states,
         transitions=transitions,
         accepting_states=accepting_states,
     )
+
+    if verbose:
+        print(product)
+    return product

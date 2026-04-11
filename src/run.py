@@ -35,8 +35,8 @@ def main():
     def run(check_ts, formula_str, verbose=False):
         formula = parse(formula_str)
         gnba = ltl_to_gnba(Not(formula), verbose=verbose)
-        nba = gnba_to_nba(gnba)
-        product = product_ts_nba(check_ts, nba)
+        nba = gnba_to_nba(gnba, verbose=verbose)
+        product = product_ts_nba(check_ts, nba, verbose=verbose)
         return check_persistence(product).satisfied
 
     for formula_str in global_formulas:

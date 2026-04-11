@@ -18,8 +18,33 @@ class NBA:
     transitions: _TransitionMap
     atomic_props: frozenset[str]
 
+    def _state_str(self, state: tuple) -> str:
+        q, layer = state
+        return f"q{q}_{layer}"
 
-def gnba_to_nba(gnba: GNBA) -> NBA:
+    def __str__(self) -> str:
+        lines = ["[NBA]"]
+        lines.append(f"  AP: {{{', '.join(sorted(self.atomic_props))}}}")
+        lines.append("  States:")
+        for state in self.states:
+            marker = "*" if state in self.initial_states else " "
+            lines.append(f"    {marker} {self._state_str(state)}")
+        lines.append("  Acceptance set:")
+        acc_str = ", ".join(self._state_str(s) for s in sorted(self.acceptance_set))
+        lines.append(f"      F = {{{acc_str}}}")
+        lines.append("  Transitions:")
+        for state, trans in self.transitions.items():
+            for ap_set, succs in trans.items():
+                if succs:
+                    ap_str = ", ".join(sorted(ap_set)) if ap_set else "∅"
+                    succ_str = ", ".join(self._state_str(s) for s in succs)
+                    lines.append(
+                        f"      {self._state_str(state)} -> {{{succ_str}}}  [{ap_str}]"
+                    )
+        return "\n".join(lines)
+
+
+def gnba_to_nba(gnba: GNBA, verbose: bool = False) -> NBA:
     """Convert GNBA to NBA.
 
     Args:
@@ -73,10 +98,14 @@ def gnba_to_nba(gnba: GNBA) -> NBA:
 
                     transitions[(q, i)] = {ap_set: result}
 
-    return NBA(
+    nba = NBA(
         states=states,
         initial_states=initial_states,
         acceptance_set=acceptance_set,
         transitions=transitions,
         atomic_props=gnba.atomic_props,
     )
+
+    if verbose:
+        print(nba)
+    return nba
