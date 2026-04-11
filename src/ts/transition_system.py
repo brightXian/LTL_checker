@@ -157,3 +157,11 @@ class TransitionSystem:
                 successors.add(to_state)
 
         return frozenset(successors)
+
+    def successors(self, state: int) -> list[int]:
+        """Return successor states as a list (adapter for product construction)."""
+        return list(self.post(state))
+
+    def label(self, state: int) -> frozenset[str]:
+        """Return atomic propositions true at state (adapter for product construction)."""
+        return self.labels[state]

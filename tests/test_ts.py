@@ -207,3 +207,25 @@ a b
         """An out-of-range state index in post() raises ValueError."""
         with pytest.raises(ValueError):
             ts.post(100)
+
+
+class TestSuccessorsAndLabel:
+    """Tests for successors() and label() methods."""
+
+    def test_successors_matches_post(self, ts):
+        """successors() returns same states as post()."""
+        for s in range(ts.num_states):
+            assert set(ts.successors(s)) == ts.post(s)
+
+    def test_label_matches_labels(self, ts):
+        """label() returns same frozenset as labels[]."""
+        for s in range(ts.num_states):
+            assert ts.label(s) == ts.labels[s]
+
+    def test_successors_returns_list(self, ts):
+        """successors() returns a list."""
+        assert isinstance(ts.successors(0), list)
+
+    def test_label_returns_frozenset(self, ts):
+        """label() returns a frozenset."""
+        assert isinstance(ts.label(0), frozenset)
