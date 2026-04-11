@@ -31,7 +31,7 @@ def product_ts_nba(ts, nba: NBA) -> ProductTS:
     initial_candidates = []
 
     for s in ts.initial_states:
-        label = ts.label(s)
+        label = ts.label(s) & nba.atomic_props
         for q in nba.initial_states:
             nba_succs = nba.transitions.get(q, {}).get(label, [])
             for nba_state in nba_succs:
@@ -63,7 +63,7 @@ def product_ts_nba(ts, nba: NBA) -> ProductTS:
 
         for t in ts_succs:
             # Read label of destination state t
-            label = ts.label(t)
+            label = ts.label(t) & nba.atomic_props
 
             # Follow NBA transitions using the label
             nba_succs = nba.transitions.get(q, {}).get(label, [])

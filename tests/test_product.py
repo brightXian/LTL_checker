@@ -48,7 +48,9 @@ class TestProductInitialStates:
     def test_no_initial_states_when_nba_rejects_label(self):
         """No initial states when NBA has no transition on TS initial label."""
         ts = MockTS(
-            initial_states=[0], successors_map={}, label_map={0: frozenset({"a", "b"})}
+            initial_states=[0],
+            successors_map={},
+            label_map={0: frozenset({"b"})},
         )
         nba = NBA(
             states=[(0, 1)],
