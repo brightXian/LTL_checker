@@ -23,7 +23,7 @@ F -->|ndfs.py| G[0 or 1]
 ## Install
 
 ```bash
-pip install -e .
+pip install -e ".[dev]"
 ```
 
 ## Usage
